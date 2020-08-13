@@ -15,7 +15,7 @@
 // swagger:meta
 package handlers
 
-import "github/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
+import "github.com/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
 
 //
 // NOTE: Types defined here are purely for documentation purposes

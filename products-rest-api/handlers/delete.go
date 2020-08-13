@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"github/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
 	"net/http"
+
+	"github.com/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
 )
 
 // swagger:route DELETE /products/{id} products deleteProduct

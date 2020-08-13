@@ -3,17 +3,20 @@ package main
 import (
 	"context"
 
-	"github/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
-	"github/JamieBShaw/golang-mux-rest-api/products-rest-api/handlers"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	protos "github.com/JamieBShaw/golang-mux-rest-api/currency/protos/currencypb"
+	"github.com/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
+	"github.com/JamieBShaw/golang-mux-rest-api/products-rest-api/handlers"
+
 	"github.com/go-openapi/runtime/middleware"
 	goHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"google.golang.org/api/transport/grpc"
 )
 
 //var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
@@ -23,8 +26,18 @@ func main() {
 	l := log.New(os.Stdout, "products-api ", log.LstdFlags)
 	v := data.NewValidation()
 
+	conn, err := grpc.Dial("localhost:9092")
+	if err != nil {
+		panic(err)
+	}
+
+	defer conn.Close()
+
+	// create currency client
+	cc := protos.NewCurrencyClient(conn)
+
 	// create the handlers
-	ph := handlers.NewProducts(l, v)
+	ph := handlers.NewProducts(l, v, cc)
 
 	// create a new serve mux and register the handlers
 	sm := mux.NewRouter()

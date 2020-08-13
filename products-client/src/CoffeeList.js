@@ -1,12 +1,12 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import axios from 'axios';
-
+import { api_location } from './api';
 class CoffeeList extends React.Component {
   readData() {
     const self = this;
     axios
-      .get(window.global.api_location + '/products')
+      .get(api_location + '/products')
       .then(function(response) {
         console.log(response.data);
 

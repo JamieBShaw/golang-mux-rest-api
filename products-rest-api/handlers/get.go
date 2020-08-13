@@ -1,8 +1,10 @@
 package handlers
 
 import (
-	"github/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
+	"context"
 	"net/http"
+
+	"github.com/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
 )
 
 // swagger:route GET /products products listProducts
@@ -58,6 +60,10 @@ func (p *Products) ListSingle(rw http.ResponseWriter, r *http.Request) {
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
 		return
 	}
+
+	// get exchange rate
+	rr := &protos.RateRequest{}
+	p.cc.GetRate(context.Background())
 
 	err = data.ToJSON(prod, rw)
 	if err != nil {

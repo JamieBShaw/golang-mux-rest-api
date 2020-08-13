@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"context"
-	"github/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
 	"net/http"
+
+	"github.com/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
 )
 
 // MiddlewareValidateProduct validates the product in the request and calls next if ok

@@ -3,11 +3,11 @@ package handlers
 import (
 	"fmt"
 
-	"github/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
 	"github.com/gorilla/mux"
 )
 
@@ -16,13 +16,14 @@ type KeyProduct struct{}
 
 // Products handler for getting and updating products
 type Products struct {
-	l *log.Logger
-	v *data.Validation
+	l  *log.Logger
+	v  *data.Validation
+	cc protos.CurrencyClient
 }
 
 // NewProducts returns a new products handler with the given logger
-func NewProducts(l *log.Logger, v *data.Validation) *Products {
-	return &Products{l, v}
+func NewProducts(l *log.Logger, v *data.Validation, cc protos.CurrencyClient) *Products {
+	return &Products{l, v, cc}
 }
 
 // ErrInvalidProductPath is an error message when the product path is not valid

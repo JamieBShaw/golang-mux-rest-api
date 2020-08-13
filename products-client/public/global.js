@@ -1,3 +1,1 @@
-window.global = {
-  api_location: 'http://localhost:9090',
-};
+window.global = {};
