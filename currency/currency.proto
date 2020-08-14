@@ -6,6 +6,7 @@ option go_package = "protos/currencypb";
 
 service Currency {
     rpc GetRate(RateRequest) returns (RateResponse);
+    rpc SubscribeRates(stream RateRequest) returns (stream RateResponse);
 }
 
 message RateRequest {
@@ -14,7 +15,9 @@ message RateRequest {
 }
 
 message RateResponse {
-    float Rate = 1;
+    Currencies Base = 1;
+    Currencies Destination = 2;
+    double Rate = 3;
 }
 
 

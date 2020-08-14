@@ -4,6 +4,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/JamieBShaw/golang-mux-rest-api/currency/data"
 	protos "github.com/JamieBShaw/golang-mux-rest-api/currency/protos/currencypb"
 	"github.com/JamieBShaw/golang-mux-rest-api/currency/server"
 	"github.com/hashicorp/go-hclog"
@@ -16,11 +17,18 @@ func main() {
 	// Setting default logger
 	log := hclog.Default()
 
+	rates, err := data.NewRates(log)
+	if err != nil {
+		log.Error("Unable to generate rates", "error", err)
+		os.Exit(1)
+
+	}
+
 	// Generate default grpc server
 	gs := grpc.NewServer()
 
 	// Setting up our currency server
-	cs := server.NewCurrency(log)
+	cs := server.NewCurrency(rates, log)
 
 	//  Registering Currency server to grpc server
 	protos.RegisterCurrencyServer(gs, cs)

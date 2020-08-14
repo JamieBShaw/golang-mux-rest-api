@@ -20,7 +20,7 @@ func (p *Products) Create(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Add("Content-Type", "application/json")
 
 	prod := r.Context().Value(KeyProduct{}).(*data.Product)
-	p.l.Printf("[DEBUG] Inserting product: %#v\n", prod)
+	p.l.Debug("Inserting Product", "debug", prod)
 
-	data.AddProduct(prod)
+	p.db.AddProduct(prod)
 }

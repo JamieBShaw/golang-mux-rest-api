@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"flag"
 
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,21 +12,23 @@ import (
 	protos "github.com/JamieBShaw/golang-mux-rest-api/currency/protos/currencypb"
 	"github.com/JamieBShaw/golang-mux-rest-api/products-rest-api/data"
 	"github.com/JamieBShaw/golang-mux-rest-api/products-rest-api/handlers"
+	"github.com/hashicorp/go-hclog"
+	"google.golang.org/grpc"
 
 	"github.com/go-openapi/runtime/middleware"
 	goHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"google.golang.org/api/transport/grpc"
 )
 
-//var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
+var serverAddr = flag.String("server_addr", "localhost:9092", "grpc server in format host:port")
 
 func main() {
 
-	l := log.New(os.Stdout, "products-api ", log.LstdFlags)
+	l := hclog.Default()
 	v := data.NewValidation()
 
-	conn, err := grpc.Dial("localhost:9092")
+	conn, err := grpc.Dial(*serverAddr, grpc.WithInsecure())
+
 	if err != nil {
 		panic(err)
 	}
@@ -36,8 +38,11 @@ func main() {
 	// create currency client
 	cc := protos.NewCurrencyClient(conn)
 
+	// create database instance
+	db := data.NewProductsDB(cc, l)
+
 	// create the handlers
-	ph := handlers.NewProducts(l, v, cc)
+	ph := handlers.NewProducts(l, v, db)
 
 	// create a new serve mux and register the handlers
 	sm := mux.NewRouter()
@@ -45,7 +50,9 @@ func main() {
 	// handlers for API
 	getR := sm.Methods(http.MethodGet).Subrouter()
 	getR.HandleFunc("/products", ph.ListAll)
+	getR.HandleFunc("/products", ph.ListAll).Queries("currency", "{[A-Z]{3}}")
 	getR.HandleFunc("/products/{id:[0-9]+}", ph.ListSingle)
+	getR.HandleFunc("/products/{id:[0-9]+}", ph.ListAll).Queries("currency", "{[A-Z]{3}}")
 
 	putR := sm.Methods(http.MethodPut).Subrouter()
 	putR.HandleFunc("/products", ph.Update)
@@ -73,17 +80,17 @@ func main() {
 	s := &http.Server{
 		Addr:         ":9090",
 		Handler:      ch(sm),
-		ErrorLog:     l,
+		ErrorLog:     l.StandardLogger(&hclog.StandardLoggerOptions{}),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
 	go func() {
-		l.Println("Starting server on port 9090")
+		l.Info("Starting server on port 9090")
 
 		err := s.ListenAndServe()
 		if err != nil {
-			l.Printf("Error starting server: %s\n", err)
+			l.Error("Error starting server: %s\n", err)
 			os.Exit(1)
 		}
 	}()
@@ -95,7 +102,7 @@ func main() {
 
 	// Block until a signal is received.
 	sig := <-c
-	log.Println("Got signal:", sig)
+	l.Info("Got signal:", sig)
 
 	// gracefully shutdown the server, waiting max 30 seconds for current operations to complete
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)

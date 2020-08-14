@@ -8,10 +8,10 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/JamieBShaw/golang-basic-microservice/products-images/files"
-	"github.com/JamieBShaw/golang-basic-microservice/products-images/handlers"
+	"github.com/JamieBShaw/golang-mux-rest-api/products-images/files"
+	"github.com/JamieBShaw/golang-mux-rest-api/products-images/handlers"
 
-	gohandlers "github.com.com/gorilla/handlers"
+	gohandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/hashicorp/go-hclog"
 	"github.com/joho/godotenv"

@@ -1,4 +1,4 @@
-module github.com/JamieBShaw/golang-basic-microservice/products-images
+module github.com/JamieBShaw/golang-mux-rest-api/products-images
 
 go 1.14
 
